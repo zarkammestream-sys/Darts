@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#09090f">
+<title>🎯 Dart AI Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#09090f; --s1:#111118; --s2:#18181f; --bd:#252535;
+  --ac:#ff3030; --ac2:#ff8c00; --gold:#ffd700; --green:#00e676;
+  --blue:#29b6f6; --muted:#55556a; --text:#e8e8f2;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;}
+
+.screen{display:none;width:100%;height:100vh;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;}
+
+/* ── HOME ── */
+#home{background:radial-gradient(ellipse at 50% -10%,#2a0a30 0%,var(--bg) 65%);align-items:center;justify-content:center;padding:28px 20px;gap:28px;}
+.logo-main{font-family:'Bebas Neue',cursive;font-size:clamp(52px,9vw,90px);letter-spacing:10px;line-height:1;background:linear-gradient(135deg,#fff 0%,var(--ac) 45%,var(--ac2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
+.logo-rule{height:2px;background:linear-gradient(90deg,transparent,var(--ac),transparent);margin:10px auto;width:50%;}
+.logo-sub{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:5px;text-align:center;}
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:860px;}
+.mode-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:24px 16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s,border-color .2s;}
+.mode-card:active{transform:scale(0.96);border-color:var(--ac);}
+.mc-icon{font-size:38px;display:block;margin-bottom:10px;}
+.mc-name{font-family:'Bebas Neue',cursive;font-size:clamp(20px,2.5vw,30px);letter-spacing:2px;}
+.mc-desc{font-size:13px;color:var(--muted);margin-top:4px;font-weight:300;}
+.mc-badge{position:absolute;top:12px;right:12px;background:var(--ac);color:#fff;font-size:9px;font-family:'Share Tech Mono',monospace;padding:3px 7px;border-radius:4px;letter-spacing:1px;}
+
+/* ── SETUP ── */
+#setup{background:var(--bg);overflow-y:auto;}
+.setup-wrap{padding:24px;display:flex;flex-direction:column;gap:16px;max-width:700px;margin:0 auto;width:100%;}
+.setup-title{font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:4px;}
+.back-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:17px;cursor:pointer;padding:0;font-weight:600;}
+.player-count-row{display:flex;align-items:center;justify-content:space-between;background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;}
+.pc-label{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;}
+.pc-controls{display:flex;align-items:center;gap:16px;}
+.pc-btn{width:40px;height:40px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.pc-btn:active{background:var(--ac);border-color:var(--ac);}
+.pc-num{font-family:'Bebas Neue',cursive;font-size:32px;color:var(--ac);min-width:32px;text-align:center;}
+.player-inputs{display:flex;flex-direction:column;gap:10px;}
+.pi-row{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;}
+.pi-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.pi-input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;outline:none;}
+.pi-input::placeholder{color:var(--muted);}
+.start-btn{background:linear-gradient(135deg,var(--ac) 0%,#b71c1c 100%);border:none;border-radius:14px;padding:20px;color:#fff;font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:4px;cursor:pointer;box-shadow:0 8px 32px rgba(255,48,48,0.28);}
+.start-btn:active{transform:scale(0.97);}
+
+/* ── GAME ── */
+#game{background:var(--bg);}
+.g-header{padding:10px 16px;background:var(--s1);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.g-mode{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--ac);letter-spacing:3px;}
+.g-round{font-weight:700;font-size:13px;color:var(--muted);}
+.g-quit{width:34px;height:34px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);}
+.game-body{display:flex;flex:1;overflow:hidden;}
+
+/* Scoreboard — scrollable horizontal list */
+.game-left{display:flex;flex-direction:column;width:42%;border-right:1px solid var(--bd);overflow:hidden;flex-shrink:0;}
+.scoreboard{display:flex;overflow-x:auto;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.score-panel{min-width:100px;flex:1;padding:12px 12px 10px;position:relative;border-right:1px solid var(--bd);transition:background .3s;flex-shrink:0;}
+.score-panel:last-child{border-right:none;}
+.score-panel.active{background:rgba(255,255,255,0.03);}
+.sp-bar{position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .3s;}
+.score-panel.active .sp-bar{opacity:1;}
+.sp-name{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sp-score{font-family:'Bebas Neue',cursive;font-size:clamp(32px,4vw,52px);line-height:1;letter-spacing:1px;}
+.sp-sub{font-size:10px;color:var(--muted);margin-top:2px;font-family:'Share Tech Mono',monospace;min-height:12px;}
+
+/* Cricket */
+.cricket-grid{padding:6px 12px 8px;border-bottom:1px solid var(--bd);flex-shrink:0;overflow-y:auto;}
+.cg-header{display:grid;grid-template-columns:1fr 40px 1fr;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);text-align:center;padding:4px 0 4px;border-bottom:1px solid var(--bd);margin-bottom:2px;}
+.cg-row{display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.cg-marks{font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:700;}
+.cg-marks.p1{text-align:right;}
+.cg-marks.p2{text-align:left;}
+.cg-target{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;text-align:center;}
+
+/* ATM */
+.atm-bar{padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;gap:5px;overflow-x:auto;flex-shrink:0;}
+.atm-chip{flex-shrink:0;border-radius:7px;padding:4px 8px;font-family:'Bebas Neue',cursive;font-size:16px;border:2px solid var(--bd);color:var(--muted);}
+.atm-chip.curr{border-color:var(--ac);color:var(--ac);background:rgba(255,48,48,0.1);}
+.atm-chip.done{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
+
+/* Turn / history */
+.turn-bar{padding:10px 14px;background:var(--s2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.turn-name{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:2px;}
+.pips{display:flex;gap:6px;}
+.pip{width:10px;height:10px;border-radius:50%;border:2px solid var(--muted);transition:all .2s;}
+.pip.used{background:var(--ac);border-color:var(--ac);box-shadow:0 0 8px var(--ac);}
+.throw-hist{padding:7px 12px;display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--bd);min-height:40px;align-items:center;flex-shrink:0;}
+.t-chip{flex-shrink:0;border:1px solid var(--bd);border-radius:5px;padding:3px 8px;font-family:'Share Tech Mono',monospace;font-size:12px;font-weight:700;background:var(--s1);}
+.t-chip.bull{border-color:var(--gold);color:var(--gold);}
+.t-chip.tri{border-color:var(--green);color:var(--green);}
+.t-chip.dbl{border-color:var(--blue);color:var(--blue);}
+
+/* Camera side */
+.game-right{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.cam-section{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow:hidden;}
+.cam-wrap{position:relative;background:#000;border-radius:14px;overflow:hidden;border:2px solid var(--bd);flex:1;min-height:0;transition:border-color .4s;}
+.cam-wrap.ok{border-color:var(--green);}
+.cam-wrap.warn{border-color:var(--ac2);}
+.cam-wrap.bad{border-color:var(--ac);}
+#vid{width:100%;height:100%;object-fit:cover;display:block;}
+#cap{display:none;}
+.cam-guide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.g-circle{width:65%;aspect-ratio:1;border-radius:50%;border:2px dashed rgba(255,255,255,0.22);position:absolute;}
+.g-h{position:absolute;width:65%;height:1px;background:rgba(255,255,255,0.12);}
+.g-v{position:absolute;width:1px;height:65%;background:rgba(255,255,255,0.12);}
+.live-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.75);border-radius:6px;padding:3px 10px;font-family:'Share Tech Mono',monospace;font-size:10px;display:flex;align-items:center;gap:6px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);box-shadow:0 0 7px var(--ac);animation:blink 1s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.angle-msg{position:absolute;bottom:8px;left:8px;right:8px;background:rgba(0,0,0,0.8);border-radius:8px;padding:6px 12px;font-family:'Share Tech Mono',monospace;font-size:11px;text-align:center;backdrop-filter:blur(6px);}
+.cam-start-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.72);cursor:pointer;gap:10px;}
+.cso-icon{font-size:46px;}
+.cso-txt{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;}
+.cso-hint{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0;}
+.btn-analyze{grid-column:1/-1;background:linear-gradient(135deg,var(--ac) 0%,#b71c1c 100%);border:none;border-radius:14px;padding:16px;color:#fff;font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;cursor:pointer;transition:all .2s;box-shadow:0 6px 20px rgba(255,48,48,0.22);}
+.btn-analyze:disabled{background:linear-gradient(135deg,#2a2a2a,#1a1a1a);color:var(--muted);box-shadow:none;cursor:not-allowed;}
+.btn-sm{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;color:var(--text);font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:1px;cursor:pointer;}
+.btn-sm:active{transform:scale(0.96);}
+.btn-bust{border-color:var(--ac);color:var(--ac);}
+
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(5px);}
+.overlay.open{display:flex;}
+.sheet{background:var(--s1);border-radius:24px 24px 0 0;padding:24px 20px;width:100%;border-top:1px solid var(--bd);animation:slideUp .28s cubic-bezier(.4,0,.2,1);max-height:90vh;overflow-y:auto;}
+.sheet-ac{border-top:2px solid var(--ac);background:var(--s2);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-title{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:3px;text-align:center;margin-bottom:18px;}
+.mod-tabs{display:flex;gap:7px;margin-bottom:12px;}
+.mod-tab{flex:1;padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:10px;color:var(--muted);font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;cursor:pointer;text-align:center;}
+.mod-tab.on{background:var(--ac);border-color:var(--ac);color:#fff;}
+.numpad{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px;}
+.nk{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:13px 4px;color:var(--text);font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer;text-align:center;transition:all .12s;}
+.nk:active,.nk.sel{background:rgba(255,48,48,0.2);border-color:var(--ac);}
+.nk.spec{color:var(--gold);border-color:rgba(255,215,0,0.3);}
+.nk.miss{color:var(--muted);}
+.sheet-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sh-cancel{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px;color:var(--text);font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer;}
+.sh-ok{background:var(--ac);border:none;border-radius:12px;padding:14px;color:#fff;font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer;}
+.err-msg{background:rgba(255,48,48,0.1);border:1px solid rgba(255,48,48,0.3);border-radius:8px;padding:9px 14px;color:var(--ac);font-size:12px;font-family:'Share Tech Mono',monospace;text-align:center;margin-bottom:10px;display:none;}
+.ai-spinner{width:48px;height:48px;border-radius:50%;border:3px solid var(--bd);border-top-color:var(--ac);animation:spin .8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-loading{text-align:center;padding:44px 0;}
+.ai-ltxt{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:2px;animation:fade 1.5s ease-in-out infinite;}
+@keyframes fade{0%,100%{opacity:.4}50%{opacity:1}}
+.ai-throws{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.ai-card{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px;text-align:center;}
+.ai-tl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;display:block;margin-bottom:5px;}
+.ai-tv{font-family:'Bebas Neue',cursive;font-size:30px;letter-spacing:2px;}
+.ai-total{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.ai-tval{font-family:'Bebas Neue',cursive;font-size:40px;letter-spacing:2px;color:var(--ac);}
+.ai-badge{background:linear-gradient(135deg,var(--ac),var(--ac2));padding:4px 10px;border-radius:6px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#fff;letter-spacing:2px;}
+.ai-note{color:var(--muted);font-size:11px;font-family:'Share Tech Mono',monospace;text-align:center;margin-bottom:10px;}
+
+/* ── WIN ── */
+#win{background:radial-gradient(ellipse at 50% 20%,#1a1200 0%,var(--bg) 70%);align-items:center;justify-content:center;text-align:center;padding:32px 20px;gap:0;overflow-y:auto;}
+.win-trophy{font-size:clamp(72px,10vw,110px);animation:float 2s ease-in-out infinite;display:block;margin-bottom:12px;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.win-label{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:6px;color:var(--muted);margin-bottom:4px;}
+.win-name{font-family:'Bebas Neue',cursive;font-size:clamp(44px,7vw,72px);letter-spacing:4px;background:linear-gradient(135deg,var(--gold) 0%,var(--ac2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.win-stats{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:20px;width:100%;max-width:360px;margin:24px auto;}
+.ws-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);}
+.ws-row:last-child{border-bottom:none;}
+.ws-label{color:var(--muted);font-size:14px;}
+.ws-val{font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:700;}
+.win-btns{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:360px;}
+.btn-replay{background:linear-gradient(135deg,var(--gold),var(--ac2));border:none;border-radius:14px;padding:18px;color:#000;font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:3px;cursor:pointer;width:100%;}
+.btn-home2{background:transparent;border:1px solid var(--bd);border-radius:14px;padding:14px;color:var(--text);font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:2px;cursor:pointer;width:100%;}
+
+/* Leaderboard on win for multiplayer */
+.leaderboard{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:16px;width:100%;max-width:360px;margin:16px auto 0;}
+.lb-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bd);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-family:'Bebas Neue',cursive;font-size:22px;color:var(--muted);width:28px;}
+.lb-rank.gold{color:var(--gold);}
+.lb-name{flex:1;font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-score{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div>
+    <div class="logo-main">DART AI PRO</div>
+    <div class="logo-rule"></div>
+    <div class="logo-sub">AUTO SCORER · VISION IA · JUSQU'À 10 JOUEURS</div>
+  </div>
+  <div class="mode-grid">
+    <div class="mode-card" onclick="selMode('501')">
+      <span class="mc-icon">🏆</span>
+      <div class="mc-name">501</div>
+      <div class="mc-desc">Double out · Règles BDO/PDC officielles</div>
+      <div class="mc-badge">CLASSIQUE</div>
+    </div>
+    <div class="mode-card" onclick="selMode('cricket')">
+      <span class="mc-icon">🦗</span>
+      <div class="mc-name">Cricket</div>
+      <div class="mc-desc">15→20 + Bull · Fermer & scorer</div>
+      <div class="mc-badge">TACTIQUE</div>
+    </div>
+    <div class="mode-card" onclick="selMode('atm')">
+      <span class="mc-icon">🌍</span>
+      <div class="mc-name">Autour du Monde</div>
+      <div class="mc-desc">1 → 20 → Bull · Premier arrivé gagne</div>
+      <div class="mc-badge">AMBIANCE</div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="setup" class="screen">
+  <div class="setup-wrap">
+    <button class="back-btn" onclick="showScreen('home')">← Retour</button>
+    <div class="setup-title" id="setupTitle">501</div>
+
+    <div class="player-count-row">
+      <div class="pc-label">NOMBRE DE JOUEURS</div>
+      <div class="pc-controls">
+        <div class="pc-btn" onclick="changeCount(-1)">−</div>
+        <div class="pc-num" id="pcNum">2</div>
+        <div class="pc-btn" onclick="changeCount(1)">+</div>
+      </div>
+    </div>
+
+    <div class="player-inputs" id="playerInputs"></div>
+    <button class="start-btn" onclick="startGame()">🎯 LANCER LA PARTIE</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="g-header">
+    <div class="g-mode" id="gMode">501</div>
+    <div class="g-round" id="gRound">ROUND 1</div>
+    <div class="g-quit" onclick="quitGame()">✕</div>
+  </div>
+  <div class="game-body">
+    <div class="game-left">
+      <div class="scoreboard" id="scoreboard"></div>
+      <div class="cricket-grid" id="cricketGrid" style="display:none">
+        <div class="cg-header" id="cgHeader"></div>
+        <div id="cgRows"></div>
+      </div>
+      <div class="atm-bar" id="atmBar" style="display:none"></div>
+      <div class="turn-bar">
+        <div class="turn-name" id="turnName">JOUEUR 1</div>
+        <div class="pips">
+          <div class="pip" id="pip0"></div>
+          <div class="pip" id="pip1"></div>
+          <div class="pip" id="pip2"></div>
+        </div>
+      </div>
+      <div class="throw-hist" id="throwHist"></div>
+    </div>
+    <div class="game-right">
+      <div class="cam-section">
+        <div class="cam-wrap" id="camWrap">
+          <video id="vid" autoplay playsinline muted></video>
+          <canvas id="cap"></canvas>
+          <div class="cam-guide">
+            <div class="g-circle"></div>
+            <div class="g-h"></div>
+            <div class="g-v"></div>
+          </div>
+          <div class="live-badge" id="liveBadge" style="display:none">
+            <div class="live-dot"></div>
+            <span style="color:var(--text)">LIVE</span>
+          </div>
+          <div class="angle-msg" id="angleMsg" style="display:none"></div>
+          <div class="cam-start-overlay" id="camOverlay" onclick="startCam()">
+            <div class="cso-icon">📷</div>
+            <div class="cso-txt">ACTIVER LA CAMÉRA</div>
+            <div class="cso-hint">APPUYER ICI</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-analyze" id="btnAnalyze" onclick="analyzeBoard()" disabled>🎯 ANALYSER LA CIBLE</button>
+          <button class="btn-sm" onclick="openManual()">✏️ MANUEL</button>
+          <button class="btn-sm btn-bust" onclick="doBust()">💥 BUST</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WIN -->
+<div id="win" class="screen">
+  <span class="win-trophy">🏆</span>
+  <div class="win-label">VICTOIRE !</div>
+  <div class="win-name" id="winName"></div>
+  <div class="win-stats" id="winStats"></div>
+  <div class="leaderboard" id="leaderboard" style="display:none"></div>
+  <div class="win-btns" style="margin-top:20px">
+    <button class="btn-replay" onclick="playAgain()">REJOUER</button>
+    <button class="btn-home2" onclick="goHome()">ACCUEIL</button>
+  </div>
+</div>
+
+<!-- MANUAL MODAL -->
+<div class="overlay" id="manualOverlay">
+  <div class="sheet">
+    <div class="sheet-title">SAISIE MANUELLE</div>
+    <div class="mod-tabs">
+      <div class="mod-tab on" id="mod1" onclick="setMod(1)">SIMPLE</div>
+      <div class="mod-tab" id="mod2" onclick="setMod(2)">DOUBLE</div>
+      <div class="mod-tab" id="mod3" onclick="setMod(3)">TRIPLE</div>
+    </div>
+    <div class="numpad" id="numpad"></div>
+    <div class="err-msg" id="errMsg"></div>
+    <div class="sheet-btns">
+      <button class="sh-cancel" onclick="closeManual()">ANNULER</button>
+      <button class="sh-ok" onclick="confirmManual()">VALIDER</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI MODAL -->
+<div class="overlay" id="aiOverlay">
+  <div class="sheet sheet-ac" id="aiSheet">
+    <div class="ai-loading"><div class="ai-spinner"></div><div class="ai-ltxt">ANALYSE IA EN COURS...</div></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// PLAYER COLORS (up to 10)
+// ════════════════════════════════════════
+const PCOLS = ['#ff3030','#29b6f6','#00e676','#ffd700','#ff8c00','#e040fb','#f06292','#80cbc4','#aed581','#ff7043'];
+const CRICKET_T = [15,16,17,18,19,20,'B'];
+const ATM_T = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,'B'];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let gMode='501', nPlayers=2, pNames=[], cp=0, round=1, nDarts=0, turnThrows=[];
+let streamRef=null, camOn=false, angleState=null;
+let s501=[], cMarks=[], cScores=[], atmProg=[];
+let gStats=[];
+let manMod=1, manSel=null;
+let finishOrder=[]; // track finishing order for multiplayer
+
+// ════════════════════════════════════════
+// SETUP
+// ════════════════════════════════════════
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function selMode(m){
+  gMode=m;
+  document.getElementById('setupTitle').textContent={501:'501',cricket:'CRICKET',atm:'AUTOUR DU MONDE'}[m];
+  renderPlayerInputs();
+  showScreen('setup');
+}
+
+function changeCount(d){
+  nPlayers=Math.min(10,Math.max(2,nPlayers+d));
+  document.getElementById('pcNum').textContent=nPlayers;
+  renderPlayerInputs();
+}
+
+function renderPlayerInputs(){
+  const c=document.getElementById('playerInputs');
+  c.innerHTML=[...Array(nPlayers)].map((_,i)=>`
+    <div class="pi-row">
+      <div class="pi-dot" style="background:${PCOLS[i]}"></div>
+      <input class="pi-input" id="pi${i}" placeholder="Joueur ${i+1}" maxlength="12" type="text" style="caret-color:${PCOLS[i]}">
+    </div>`).join('');
+}
+
+function startGame(){
+  pNames=[...Array(nPlayers)].map((_,i)=>(document.getElementById(`pi${i}`)?.value.trim()||`JOUEUR ${i+1}`).toUpperCase());
+  cp=0;round=1;nDarts=0;turnThrows=[];finishOrder=[];
+  gStats=[...Array(nPlayers)].map(()=>({rounds:0,darts:0,total:0,finished:false}));
+
+  if(gMode==='501'){s501=[...Array(nPlayers)].map(()=>501);}
+  else if(gMode==='cricket'){
+    cMarks=[...Array(nPlayers)].map(()=>Object.fromEntries(CRICKET_T.map(t=>[t,0])));
+    cScores=[...Array(nPlayers)].map(()=>0);
+  } else {atmProg=[...Array(nPlayers)].map(()=>0);}
+
+  document.getElementById('cricketGrid').style.display=gMode==='cricket'?'block':'none';
+  document.getElementById('atmBar').style.display=gMode==='atm'?'flex':'none';
+
+  buildNumpad();renderScoreboard();updateUI();showScreen('game');
+}
+
+// ════════════════════════════════════════
+// SCOREBOARD
+// ════════════════════════════════════════
+function renderScoreboard(){
+  document.getElementById('scoreboard').innerHTML=[...Array(nPlayers)].map((_,i)=>`
+    <div class="score-panel" id="sp${i}">
+      <div class="sp-bar" id="bar${i}" style="background:${PCOLS[i]}"></div>
+      <div class="sp-name" id="spn${i}">${pNames[i]}</div>
+      <div class="sp-score" id="sps${i}" style="color:${PCOLS[i]}">—</div>
+      <div class="sp-sub" id="spsub${i}"></div>
+    </div>`).join('');
+}
+
+function updateUI(){
+  document.getElementById('gMode').textContent={501:'501',cricket:'CRICKET',atm:'AUTOUR DU MONDE'}[gMode];
+  document.getElementById('gRound').textContent=`ROUND ${round}`;
+
+  const tn=document.getElementById('turnName');
+  tn.textContent=pNames[cp];tn.style.color=PCOLS[cp];
+
+  [...Array(nPlayers)].forEach((_,i)=>{
+    document.getElementById(`sp${i}`)?.classList.toggle('active',i===cp);
+    document.getElementById(`bar${i}`).style.opacity=i===cp?1:0;
+    document.getElementById(`spn${i}`).textContent=pNames[i];
+
+    if(gMode==='501'){
+      document.getElementById(`sps${i}`).textContent=s501[i];
+      document.getElementById(`spsub${i}`).textContent=checkout(s501[i]);
+    } else if(gMode==='cricket'){
+      document.getElementById(`sps${i}`).textContent=cScores[i];
+      document.getElementById(`spsub${i}`).textContent='PTS';
+    } else {
+      const t=ATM_T[Math.min(atmProg[i],ATM_T.length-1)];
+      document.getElementById(`sps${i}`).textContent=t==='B'?'BULL':t;
+      document.getElementById(`spsub${i}`).textContent=`${atmProg[i]}/${ATM_T.length}`;
+    }
+  });
+
+  [0,1,2].forEach(i=>document.getElementById(`pip${i}`).classList.toggle('used',i<nDarts));
+  if(gMode==='cricket') renderCricket();
+  if(gMode==='atm') renderATM();
+  renderHistory();
+}
+
+function checkout(s){const m={170:'T20 T20 Bull',167:'T20 T19 Bull',160:'T20 T20 D20',100:'T20 D20',98:'T20 D19',97:'T19 D20',50:'Bull',40:'D20',32:'D16',16:'D8',2:'D1'};return(s>1&&s<=170)?m[s]||':'';}
+function marks(n){return n===0?'':n===1?'/':n===2?'X':'●';}
+
+function renderCricket(){
+  document.getElementById('cgHeader').innerHTML=
+    `<span style="text-align:right">${pNames.slice(0,Math.ceil(nPlayers/2)).map((n,i)=>`<span style="color:${PCOLS[i]}">${n.slice(0,4)}</span>`).join(' ')}</span>`+
+    `<span style="text-align:center">—</span>`+
+    `<span style="text-align:left">${pNames.slice(Math.ceil(nPlayers/2)).map((n,i)=>`<span style="color:${PCOLS[Math.ceil(nPlayers/2)+i]}">${n.slice(0,4)}</span>`).join(' ')}</span>`;
+
+  // simplified: show cp's marks vs leading opponent
+  document.getElementById('cgRows').innerHTML=CRICKET_T.map(t=>{
+    const m0=cMarks[cp]?.[t]||0;
+    const op=cp===0?1:0;
+    const m1=cMarks[op]?.[t]||0;
+    const closed=m0>=3&&m1>=3;
+    return `<div class="cg-row">
+      <div class="cg-marks p1" style="color:${PCOLS[cp]};text-align:right">${m0>=3?'✓':''}${marks(m0)}</div>
+      <div class="cg-target" style="${closed?'text-decoration:line-through;color:var(--muted)':''}">${t}</div>
+      <div class="cg-marks p2" style="color:${PCOLS[op]};text-align:left">${marks(m1)}${m1>=3?'✓':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderATM(){
+  document.getElementById('atmBar').innerHTML=ATM_T.map((t,i)=>{
+    const curr=i===atmProg[cp];
+    const anyDone=atmProg.some(p=>p>i);
+    return `<div class="atm-chip ${curr?'curr':anyDone&&atmProg[cp]>i?'done':''}">${t==='B'?'B':t}</div>`;
+  }).join('');
+}
+
+function renderHistory(){
+  const h=document.getElementById('throwHist');
+  if(!turnThrows.length){h.innerHTML='<span style="color:var(--muted);font-size:11px;font-family:\'Share Tech Mono\',monospace">Aucun lancer ce tour</span>';return;}
+  h.innerHTML=turnThrows.map(t=>{
+    let cls='t-chip';
+    if(t.label==='BULL'||t.label==='25') cls+=' bull';
+    else if(t.label.startsWith('T')) cls+=' tri';
+    else if(t.label.startsWith('D')) cls+=' dbl';
+    return `<div class="${cls}">${t.label} <span style="color:var(--muted);font-size:9px">(${t.value})</span></div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// CAMERA
+// ════════════════════════════════════════
+async function startCam(){
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920}}});
+    streamRef=s;
+    document.getElementById('vid').srcObject=s;
+    camOn=true;
+    document.getElementById('camOverlay').style.display='none';
+    document.getElementById('liveBadge').style.display='flex';
+    document.getElementById('btnAnalyze').disabled=false;
+    setInterval(checkAngle,1800);
+  }catch(e){alert('Impossible d\'accéder à la caméra.\nChrome → Paramètres → Confidentialité → Caméra → Autoriser');}
+}
+
+function stopCam(){if(streamRef){streamRef.getTracks().forEach(t=>t.stop());streamRef=null;}camOn=false;}
+
+function checkAngle(){
+  const v=document.getElementById('vid'),c=document.getElementById('cap');
+  if(!v||!c||!camOn)return;
+  c.width=80;c.height=80;
+  c.getContext('2d').drawImage(v,0,0,80,80);
+  const d=c.getContext('2d').getImageData(0,0,80,80).data;
+  let sum=0,sum2=0,n=d.length/4;
+  for(let i=0;i<d.length;i+=4){const b=d[i]*.299+d[i+1]*.587+d[i+2]*.114;sum+=b;sum2+=b*b;}
+  const mean=sum/n,variance=sum2/n-mean*mean;
+  const wrap=document.getElementById('camWrap'),msg=document.getElementById('angleMsg');
+  msg.style.display='block';
+  let state,txt;
+  if(mean<25){state='bad';txt='💡 Trop sombre — allume une lumière';}
+  else if(mean>235){state='warn';txt='☀️ Trop lumineux';}
+  else if(variance<350){state='bad';txt='🔍 Trop loin — rapproche-toi';}
+  else if(variance>9000){state='warn';txt='↔️ Trop proche — recule';}
+  else{state='ok';txt='✅ Angle parfait — prêt !';}
+  angleState=state;
+  wrap.className='cam-wrap '+state;
+  msg.style.color=state==='ok'?'var(--green)':state==='warn'?'var(--ac2)':'var(--ac)';
+  msg.textContent=txt;
+  document.getElementById('btnAnalyze').disabled=state==='bad';
+}
+
+function capture(){
+  const v=document.getElementById('vid'),c=document.getElementById('cap');
+  c.width=v.videoWidth||1280;c.height=v.videoHeight||720;
+  c.getContext('2d').drawImage(v,0,0);
+  return c.toDataURL('image/jpeg',.88).split(',')[1];
+}
+
+// ════════════════════════════════════════
+// AI ANALYSIS
+// ════════════════════════════════════════
+async function analyzeBoard(){
+  if(!camOn){alert('Activez la caméra d\'abord');return;}
+  const img=capture();
+  document.getElementById('aiSheet').innerHTML='<div class="ai-loading"><div class="ai-spinner"></div><div class="ai-ltxt">ANALYSE IA EN COURS...</div></div>';
+  document.getElementById('aiOverlay').classList.add('open');
+  const ctx=gMode==='501'?`Mode 501. Score actuel: ${s501[cp]}pts.`:gMode==='cricket'?'Mode Cricket. Cibles: 15,16,17,18,19,20,Bull.':`Mode Autour du Monde. Cible: ${ATM_T[atmProg[cp]]}.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:1000,
+      system:`Tu es expert en vision fléchettes. Retourne UNIQUEMENT du JSON valide sans backticks.
+Format: {"throws":[{"label":"T20","value":60},{"label":"D5","value":10},{"label":"7","value":7}],"total":77,"note":"optionnel"}
+label: nombre, "D"+n double, "T"+n triple, "BULL"=50, "25"=bull ext, "MISS"=0. value=points réels. ${ctx}`,
+      messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},{type:'text',text:'Analyse cette cible de fléchettes.'}]}]
+    })});
+    const data=await res.json();
+    let txt=data.content?.find(b=>b.type==='text')?.text||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    renderAIResult(JSON.parse(txt));
+  }catch(e){
+    document.getElementById('aiSheet').innerHTML=`<div style="text-align:center;padding:44px 0"><div style="font-size:44px;margin-bottom:14px">⚠️</div><div style="color:var(--ac);font-family:'Share Tech Mono',monospace;font-size:11px;margin-bottom:20px">ERREUR — RÉESSAIE</div><button onclick="closeAI()" style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:13px 28px;color:var(--text);font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer">FERMER</button></div>`;
+  }
+}
+
+function renderAIResult(r){
+  const throws=r.throws||[];
+  const total=r.total||throws.reduce((a,b)=>a+b.value,0);
+  const tJSON=JSON.stringify(throws).replace(/'/g,'&#39;');
+  document.getElementById('aiSheet').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div class="ai-badge">IA VISION</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px">RÉSULTAT</div>
+    </div>
+    <div class="ai-throws">${[0,1,2].map(i=>{const t=throws[i];return`<div class="ai-card"><span class="ai-tl">FL. ${i+1}</span><div class="ai-tv" style="color:${t?'var(--ac)':'var(--muted)'}">${t?t.label:'—'}</div>${t?`<div style="font-size:10px;color:var(--muted)">${t.value}pts</div>`:''}</div>`;}).join('')}</div>
+    ${r.note?`<div class="ai-note">${r.note}</div>`:''}
+    <div class="ai-total"><span style="font-size:14px;color:var(--muted);font-weight:600">TOTAL VOLÉE</span><span class="ai-tval">${total}</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="closeAI()" style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;color:var(--text);font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer">REJETER</button>
+      <button id="btnAccept" data-t='${tJSON}' onclick="acceptAI()" style="background:var(--ac);border:none;border-radius:12px;padding:14px;color:#fff;font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer">VALIDER ✓</button>
+    </div>`;
+}
+
+function acceptAI(){
+  const throws=JSON.parse(document.getElementById('btnAccept').dataset.t||'[]');
+  closeAI();
+  throws.forEach(t=>{
+    if(gMode==='cricket') applyCricket(t.label,cp);
+    if(gMode==='atm') applyATM(t.label,cp);
+    turnThrows.push({label:t.label,value:t.value});
+    nDarts++;gStats[cp].darts++;
+  });
+  updateUI();
+  setTimeout(endTurn,60);
+}
+
+function closeAI(){document.getElementById('aiOverlay').classList.remove('open');}
+
+// ════════════════════════════════════════
+// THROW LOGIC
+// ════════════════════════════════════════
+function applyCricket(label,player){
+  let target,mult;
+  if(label==='BULL'||label==='50'){target='B';mult=2;}
+  else if(label==='25'){target='B';mult=1;}
+  else if(label.startsWith('T')){target=parseInt(label.slice(1));mult=3;}
+  else if(label.startsWith('D')){target=parseInt(label.slice(1));mult=2;}
+  else{target=parseInt(label);mult=1;}
+  if(!CRICKET_T.includes(target)) return;
+  const prev=cMarks[player][target]||0;
+  cMarks[player][target]=Math.min(3,prev+mult);
+  // Score on all opponents who haven't closed
+  if(cMarks[player][target]>=3){
+    const over=(prev+mult)-3;
+    if(over>0){
+      const pts=target==='B'?25:target;
+      [...Array(nPlayers)].forEach((_,i)=>{if(i!==player&&(cMarks[i][target]||0)<3) cScores[player]+=pts*over;});
+    }
+  }
+}
+
+function applyATM(label,player){
+  const needed=ATM_T[atmProg[player]];
+  let hit=false;
+  if(label==='BULL'||label==='50') hit=needed==='B';
+  else if(label==='25') hit=needed==='B';
+  else{const n=label.startsWith('T')||label.startsWith('D')?parseInt(label.slice(1)):parseInt(label);hit=n===needed;}
+  if(hit&&atmProg[player]<ATM_T.length) atmProg[player]++;
+}
+
+function endTurn(){
+  const total=turnThrows.reduce((a,b)=>a+b.value,0);
+  gStats[cp].total+=total;gStats[cp].rounds++;
+  let won=false;
+
+  if(gMode==='501'){
+    const prev=s501[cp],next=prev-total;
+    if(next<0||next===1){flashBust();}
+    else{
+      s501[cp]=next;
+      if(next===0){
+        const last=turnThrows[turnThrows.length-1];
+        if(last&&(last.label.startsWith('D')||last.label==='BULL')) won=true;
+        else{s501[cp]=prev;flashBust();}
+      }
+    }
+  } else if(gMode==='cricket'){
+    won=CRICKET_T.every(t=>(cMarks[cp][t]||0)>=3)&&cScores[cp]>=Math.max(...cScores.filter((_,i)=>i!==cp));
+  } else {
+    won=atmProg[cp]>=ATM_T.length;
+  }
+
+  if(won){showWin();return;}
+
+  // Next active player
+  let next=(cp+1)%nPlayers;
+  cp=next;
+  if(cp===0) round++;
+  nDarts=0;turnThrows=[];
+  updateUI();
+}
+
+function flashBust(){
+  const el=document.getElementById(`sps${cp}`);
+  const orig=el.style.color;
+  el.style.color='var(--ac)';
+  setTimeout(()=>el.style.color=orig,700);
+}
+
+function doBust(){flashBust();nDarts=3;turnThrows=[];setTimeout(endTurn,60);}
+
+// ════════════════════════════════════════
+// MANUAL INPUT
+// ════════════════════════════════════════
+function buildNumpad(){
+  document.getElementById('numpad').innerHTML=
+    [...Array(20)].map((_,i)=>`<div class="nk" onclick="selNum(${i+1},this)">${i+1}</div>`).join('')+
+    `<div class="nk spec" onclick="selNum('B',this)">BULL</div>`+
+    `<div class="nk miss" onclick="selNum('MISS',this)">MISS</div>`;
+}
+
+function openManual(){
+  manSel=null;manMod=1;
+  document.querySelectorAll('.nk').forEach(k=>k.classList.remove('sel'));
+  document.querySelectorAll('.mod-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('mod1').classList.add('on');
+  document.getElementById('errMsg').style.display='none';
+  document.getElementById('manualOverlay').classList.add('open');
+}
+
+function closeManual(){document.getElementById('manualOverlay').classList.remove('open');}
+function setMod(m){manMod=m;document.querySelectorAll('.mod-tab').forEach(t=>t.classList.remove('on'));document.getElementById(`mod${m}`).classList.add('on');}
+function selNum(n,el){manSel=n;document.querySelectorAll('.nk').forEach(k=>k.classList.remove('sel'));el.classList.add('sel');}
+
+function confirmManual(){
+  const err=document.getElementById('errMsg');
+  err.style.display='none';
+  if(manSel===null){err.textContent='Sélectionne un nombre !';err.style.display='block';return;}
+  let label,value;
+  if(manSel==='MISS'){label='MISS';value=0;}
+  else if(manSel==='B'){label=manMod>=2?'BULL':'25';value=manMod>=2?50:25;}
+  else{const b=parseInt(manSel);label=manMod===1?`${b}`:manMod===2?`D${b}`:`T${b}`;value=b*manMod;}
+
+  if(gMode==='cricket') applyCricket(label,cp);
+  if(gMode==='atm') applyATM(label,cp);
+  turnThrows.push({label,value});
+  nDarts++;gStats[cp].darts++;
+  closeManual();updateUI();
+  if(nDarts>=3) setTimeout(endTurn,60);
+}
+
+// ════════════════════════════════════════
+// WIN
+// ════════════════════════════════════════
+function showWin(){
+  stopCam();
+  document.getElementById('winName').textContent=pNames[cp];
+  const s=gStats[cp];
+  const avg=s.rounds>0?Math.round(s.total/s.rounds):0;
+  document.getElementById('winStats').innerHTML=`
+    <div class="ws-row"><span class="ws-label">Rounds joués</span><span class="ws-val">${s.rounds}</span></div>
+    <div class="ws-row"><span class="ws-label">Fléchettes lancées</span><span class="ws-val">${s.darts}</span></div>
+    <div class="ws-row"><span class="ws-label">Moy. par volée</span><span class="ws-val">${avg}</span></div>
+    <div class="ws-row"><span class="ws-label">Mode</span><span class="ws-val">${{501:'501',cricket:'Cricket',atm:'Autour du Monde'}[gMode]}</span></div>`;
+
+  // Leaderboard pour multijoueur
+  if(nPlayers>2){
+    const lb=document.getElementById('leaderboard');
+    lb.style.display='block';
+    const ranking=[...Array(nPlayers)].map((_,i)=>({i,score:gMode==='501'?501-s501[i]:gMode==='cricket'?cScores[i]:atmProg[i],name:pNames[i]}))
+      .sort((a,b)=>b.score-a.score);
+    lb.innerHTML='<div style="font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:3px;margin-bottom:10px;color:var(--muted)">CLASSEMENT</div>'+
+      ranking.map((p,rank)=>`<div class="lb-row">
+        <div class="lb-rank ${rank===0?'gold':''}">${rank===0?'🥇':rank===1?'🥈':rank===2?'🥉':rank+1}</div>
+        <div class="lb-name" style="color:${PCOLS[p.i]}">${p.name}</div>
+        <div class="lb-score">${p.score}${gMode==='501'?'pts restants':gMode==='cricket'?'pts':'/'+ATM_T.length}</div>
+      </div>`).join('');
+  }
+  showScreen('win');
+}
+
+function quitGame(){if(confirm('Abandonner la partie ?')){stopCam();showScreen('home');}}
+function goHome(){stopCam();showScreen('home');}
+function playAgain(){showScreen('setup');}
+
+// Init
+renderPlayerInputs();
+</script>
+</body>
+</html>

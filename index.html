@@ -435,7 +435,7 @@ function updateUI(){
   renderHistory();
 }
 
-function checkout(s){const m={170:'T20 T20 Bull',167:'T20 T19 Bull',160:'T20 T20 D20',100:'T20 D20',98:'T20 D19',97:'T19 D20',50:'Bull',40:'D20',32:'D16',16:'D8',2:'D1'};return(s>1&&s<=170)?m[s]||':'';}
+function checkout(s){const m={170:'T20 T20 Bull',167:'T20 T19 Bull',160:'T20 T20 D20',100:'T20 D20',98:'T20 D19',97:'T19 D20',50:'Bull',40:'D20',32:'D16',16:'D8',2:'D1'};return(s>1&&s<=170)?(m[s]||''):'';}
 function marks(n){return n===0?'':n===1?'/':n===2?'X':'●';}
 
 function renderCricket(){
